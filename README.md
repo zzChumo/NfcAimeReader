@@ -1,5 +1,13 @@
 # NFC Aime Reader
 
+较原项目多了一个仿Aime读卡器的刷卡界面，其他的功能暂时没想法
+
+依旧不会Kotlin，照着MDUI开发文档压力AI写M3（？
+
+以下为原项目README：
+
+---
+
 一个通过安卓手机 NFC 读取 Aime 卡片为 SEGA / ~~KONAMI（没做完）~~ 系游戏刷卡的项目
 
 ## :thinking: Q&A
