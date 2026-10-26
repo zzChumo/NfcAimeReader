@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalView
@@ -235,7 +236,16 @@ fun Navigation(viewModel: UserPreferenceViewModel, felicaViewModel: FelicaPrefer
             modifier = androidx.compose.ui.Modifier
                 .fillMaxSize()
                 .background(androidx.compose.ui.graphics.Color.White)
-                .clipToBounds(),
+                .clipToBounds()
+                // 遮罩期间吞掉所有触摸事件，避免误触到下层界面
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            event.changes.forEach { it.consume() }
+                        }
+                    }
+                },
             contentAlignment = androidx.compose.ui.Alignment.Center
         ) {
             val painter = painterResource(id = R.drawable.aime_fullscreen)
