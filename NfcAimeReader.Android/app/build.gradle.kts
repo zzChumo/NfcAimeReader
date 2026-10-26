@@ -14,7 +14,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "org.ohdj.nfcaimereader"
+        applicationId = "org.chumo.aime"
         minSdk = 28
         targetSdk = 34
         versionCode = project.findProperty("versionCode")?.toString()?.toInt() ?: 1
