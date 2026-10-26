@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /** 套用系统栏颜色：状态栏 = TopAppBar 色，导航栏 = 底栏色（从全屏页返回时也重新套用） */
-    private fun applySystemBarColors() {
+    internal fun applySystemBarColors() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         @Suppress("DEPRECATION")
         window.statusBarColor = statusBarColor

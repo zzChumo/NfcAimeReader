@@ -105,8 +105,25 @@ fun Navigation(viewModel: UserPreferenceViewModel, felicaViewModel: FelicaPrefer
     // 关于
     var expanded by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
+    var showFullscreen by remember { mutableStateOf(false) }
     if (showAbout) {
         AboutDialog(onDismiss = { showAbout = false })
+    }
+
+    // 全屏遮罩期间隐藏系统栏；退出时恢复为与顶栏/底栏同步的颜色
+    val rootContext = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(showFullscreen) {
+        val activity = rootContext as? org.ohdj.nfcaimereader.MainActivity ?: return@LaunchedEffect
+        val window = activity.window
+        val controller = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+        if (showFullscreen) {
+            controller.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        } else {
+            controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            activity.applySystemBarColors()
+        }
     }
 
 
@@ -133,12 +150,7 @@ fun Navigation(viewModel: UserPreferenceViewModel, felicaViewModel: FelicaPrefer
                 },
                 actions = {
                     if (currentRoute == Screen.Home.route) {
-                        val context = androidx.compose.ui.platform.LocalContext.current
-                        IconButton(onClick = {
-                            context.startActivity(
-                                android.content.Intent(context, org.ohdj.nfcaimereader.ui.fullscreen.FullscreenAimeActivity::class.java)
-                            )
-                        }) {
+                        IconButton(onClick = { showFullscreen = true }) {
                             Icon(Icons.Filled.Fullscreen, contentDescription = "Fullscreen")
                         }
 
@@ -203,6 +215,35 @@ fun Navigation(viewModel: UserPreferenceViewModel, felicaViewModel: FelicaPrefer
             composable(Screen.Setting.route) {
                 SettingScreen(viewModel, felicaViewModel)
             }
+        }
+    }
+
+    // 全屏 Aime 读卡遮罩（用遮罩而不是新 Activity，保证 NFC reader mode 持续工作）
+    if (showFullscreen) {
+        androidx.activity.compose.BackHandler { showFullscreen = false }
+        androidx.compose.foundation.layout.BoxWithConstraints(
+            modifier = androidx.compose.ui.Modifier
+                .fillMaxSize()
+                .background(androidx.compose.ui.graphics.Color.White)
+                .clipToBounds(),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            val painter = painterResource(id = R.drawable.aime_fullscreen)
+            val intrinsic = painter.intrinsicSize
+            val imageAspect = if (intrinsic.width > 0f && intrinsic.height > 0f) {
+                intrinsic.width / intrinsic.height
+            } else {
+                1600f / 2608f
+            }
+            val imageHeight = maxWidth / imageAspect
+            Image(
+                painter = painter,
+                contentDescription = "Aime 读卡",
+                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds,
+                modifier = androidx.compose.ui.Modifier
+                    .fillMaxWidth()
+                    .height(imageHeight)
+            )
         }
     }
     }
