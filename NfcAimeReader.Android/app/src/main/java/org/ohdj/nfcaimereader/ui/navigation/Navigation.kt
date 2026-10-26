@@ -120,8 +120,18 @@ fun Navigation(viewModel: UserPreferenceViewModel, felicaViewModel: FelicaPrefer
             controller.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            // 刷卡期间：屏幕常亮 + 亮度拉满
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            val attrs = window.attributes
+            attrs.screenBrightness = 1.0f
+            window.attributes = attrs
         } else {
             controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            // 退出遮罩：取消常亮、恢复系统亮度
+            window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            val attrs = window.attributes
+            attrs.screenBrightness = android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+            window.attributes = attrs
             activity.applySystemBarColors()
         }
     }
